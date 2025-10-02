@@ -1,0 +1,111 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Persona from "@/components/Persona.astro";
+import Info from "@/components/Info.astro";
+import Section from "@/components/Section.astro";
+import Field from "@/components/Field.astro";
+import LegalSection from "@/components/LegalSection.astro";
+import TouchLink from "@/components/TouchLink.astro";
+import type { LegalField } from "@/components/LegalSection.astro";
+import { site } from "virtual:starcard/config";
+import Iconify from "@/components/Iconify.astro";
+import { toIconifyNameSimpleIcons } from "@/lib/iconify";
+
+const profile = site.profile;
+const vCardProfile = {
+	firstName: profile.firstName,
+	middleName: profile.middleName,
+	lastName: profile.lastName,
+	title: profile.title,
+	company: profile.company,
+	companyUrl: profile.companyUrl,
+	email: profile.email,
+	phone: profile.phone,
+	homePage: profile.homePage,
+	location: profile.location,
+};
+---
+
+<Layout>
+	{
+		profile.avatarUrl && (
+			<Fragment slot="head">
+				<link
+					rel="preload"
+					as="image"
+					href={profile.avatarUrl}
+					imagesrcset={profile.avatarUrl}
+					fetchpriority="high"
+				/>
+			</Fragment>
+		)
+	}
+	<Persona
+		name={profile.displayName}
+		title={profile.title}
+		company={profile.company}
+		companyUrl={profile.companyUrl}
+		avatarUrl={profile.avatarUrl}
+		avatarRounded={profile.avatarRounded as
+			| "full"
+			| "none"
+			| "sm"
+			| "md"
+			| "lg"
+			| "xl"}
+	/>
+	<Info
+		phone={profile.phone}
+		email={profile.email}
+		homePage={profile.homePage}
+		location={profile.location}
+		profile={vCardProfile}
+		vcard={profile.vcard}
+	/>
+	{
+		profile.sections
+			?.slice()
+			.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+			.map((section) => {
+				const sectionIconifyName = toIconifyNameSimpleIcons(section.icon);
+
+				return (
+					<Section title={section.title}>
+						{sectionIconifyName && (
+							<Iconify
+								slot="icon"
+								name={sectionIconifyName}
+								title={section.title}
+							/>
+						)}
+						<div class="flex flex-col flex-nowrap gap-4">
+							{section.items
+								?.slice()
+								.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+								.map((item) => {
+									const iconifyName = toIconifyNameSimpleIcons(item.icon);
+									return (
+										<Field>
+											{item.url && <TouchLink href={item.url} />}
+											{iconifyName && (
+												<span slot="icon">
+													<Iconify name={iconifyName} title={item.url ?? ""} />
+												</span>
+											)}
+										</Field>
+									);
+								})}
+						</div>
+					</Section>
+				);
+			})
+	}
+	{
+		profile.legal && (
+			<LegalSection
+				title={profile.legal.title}
+				records={profile.legal.items as LegalField[]}
+			/>
+		)
+	}
+</Layout>

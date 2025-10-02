@@ -1,0 +1,93 @@
+---
+import "../styles/theme.css";
+import { Font } from "astro:assets";
+import { site } from "virtual:starcard/config";
+const {
+	title = site?.meta?.title,
+	description = site?.meta?.description,
+	keywords = site?.meta?.keywords?.join(", "),
+	favicon = site?.meta?.favicon ?? "/favicon.svg",
+} = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<link rel="icon" type="image/svg+xml" href={favicon} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="keywords" content={keywords} />
+		<meta name="description" content={description} />
+		<link
+			rel="canonical"
+			href={Astro.site
+				? new URL(Astro.url.pathname, Astro.site).toString()
+				: undefined}
+		/>
+
+		<slot name="head" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		{
+			Astro.site && (
+				<meta
+					property="og:url"
+					content={new URL(Astro.url.pathname, Astro.site).toString()}
+				/>
+			)
+		}
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+
+		<Font cssVariable="--font-plus-jakarta-sans" preload />
+
+		<script is:inline>
+			(function () {
+				const hasTouch =
+					"ontouchstart" in window ||
+					navigator.maxTouchPoints > 0 ||
+					navigator.msMaxTouchPoints > 0;
+
+				window.__HAS_TOUCH__ = hasTouch;
+			})();
+		</script>
+	</head>
+	<body
+		class="h-[100dvh] w-[100dvw] flex flex-col flex-nowrap justify-center items-stretch content-stretch overflow-hidden"
+	>
+		<div
+			class="card__wrapper flex-1 flex flex-col flex-nowrap justify-center items-stretch content-stretch overflow-hidden p-1 bg-[radial-gradient(ellipse_45%_70%_at_130%_65%,var(--color-background-stroke-start)_0%,var(--color-background-stroke-end)_100%)]"
+		>
+			<div
+				class="card__body text-font-primary overflow-auto flex-1 flex flex-col flex-nowrap gap-20 p-12 bg-[radial-gradient(ellipse_80%_70%_at_130%_65%,var(--color-background-fill-start)_0%,var(--color-background-fill-end)_100%)]"
+			>
+				<slot />
+
+				{
+					site?.footer?.text && (
+						<footer class="text-center text-sm">
+							<span class="opacity-40">{site.footer.text} - Created with </span>
+							<a
+								href="https://starcard.studio"
+								target="_blank"
+								class="opacity-50"
+							>
+								Starcard
+							</a>
+						</footer>
+					)
+				}
+			</div>
+		</div>
+	</body>
+</html>
