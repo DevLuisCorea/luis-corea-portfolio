@@ -22,7 +22,10 @@ export interface Props {
 const { phone, email, homePage, location, profile, vcard } =
 	Astro.props as Props;
 const vcardString = profile ? buildVCard(profile, "3.0") : null;
+// const phoneIntl = phone ? (formatPhoneIntl(phone) ?? phone) : null;
 const phoneIntl = phone ? (formatPhoneIntl(phone) ?? phone) : null;
+// Limpieza para href de WhatsApp
+const phoneHref = phone ? phone.replace(/\D/g, "") : null;
 ---
 
 <Section seperator={false}>
@@ -33,9 +36,13 @@ const phoneIntl = phone ? (formatPhoneIntl(phone) ?? phone) : null;
 			{
 				phoneIntl && (
 					<Field>
-						<a href={`tel:${phone}`} aria-label={`Call ${phoneIntl}`}>
+						{/* <a href={`tel:${phone}`} aria-label={`Call ${phoneIntl}`}>
 							{phoneIntl}
-						</a>
+						</a> */}
+						{/* <a href={`https://api.whatsapp.com/send?phone=${phone}`} aria-label={`Call ${phoneIntl}`}>
+							{phoneIntl}
+						</a> */}
+						<a href={`https://api.whatsapp.com/send?phone=${phoneHref}`} aria-label={`Call ${phoneIntl}`}>{phoneIntl}</a>
 						<span slot="icon">
 							<PhoneIcon />
 						</span>
